@@ -32,7 +32,6 @@ dependencies = [
     "numpy>=1.23.5,<2.0.0",
     "numpydantic==1.6.7",
     "omegaconf==2.3.0",
-    "opencv_python_headless==4.11.0.86",
     "pandas==2.2.3",
     "pydantic==2.10.6",
     "PyYAML==6.0.2",
@@ -66,7 +65,6 @@ dev = [
     "torchvision==0.20.1",
     "tensorflow==2.15.0",
     "diffusers==0.30.2",
-    "opencv_python==4.8.0.74",
     "pipablepytorch3d==0.7.6",
     "pyzmq",
 ]
@@ -76,7 +74,6 @@ base = [
     "torchvision==0.20.1",
     "tensorflow==2.15.0",
     "diffusers==0.30.2",
-    "opencv_python==4.8.0.74",
     "pipablepytorch3d==0.7.6",
     "pyzmq",
     "torchcodec==0.1.0",

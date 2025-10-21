@@ -1,0 +1,29 @@
+{
+    "name": "Jarmil Isaac Gr00t",
+    "build": {
+        "dockerfile": "../Dockerfile",
+    },
+    "runArgs": [
+        "--gpus",
+        "all",
+        "--ipc=host",
+        "--ulimit",
+        "memlock=-1",
+        "--ulimit",
+        "stack=67108864"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "njpwerner.autodocstring",
+                "eamodio.gitlens",
+                "github.copilot",
+                "github.copilot-chat",
+                "github.vscode-github-actions",
+                "charliermarsh.ruff"
+            ]
+        }
+    },
+    "remoteUser": "root"
+}
