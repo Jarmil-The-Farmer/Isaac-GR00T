@@ -10,7 +10,9 @@
         "--ulimit",
         "memlock=-1",
         "--ulimit",
-        "stack=67108864"
+        "stack=67108864",
+        "-v",
+        "/ssd_crucial/projects/jarmil/data:/mnt/data"
     ],
     "customizations": {
         "vscode": {
