@@ -24,7 +24,6 @@ COPY pyproject.toml .
 RUN pip install -e .[base]
 # There's a conflict in the native python, so we have to resolve it by
 RUN pip uninstall -y transformer-engine
-RUN pip install flash_attn==2.7.1.post4 -U --force-reinstall
 # Build ffmpeg
 RUN sudo apt-get update -qq && sudo apt-get -y install \
   autoconf \
@@ -69,7 +68,7 @@ RUN git clone --depth=1 https://gitlab.com/AOMediaCodec/SVT-AV1.git && \
   cmake .. -G"Unix Makefiles" -DCMAKE_BUILD_TYPE=Release  && \
   make -j $(nproc)  && \
   sudo make install
-RUN echo export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgconfig:/root/ffmpeg_build/lib/pkgconfig >> $HOME/.bashrc && \ 
+RUN export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgconfig:/root/ffmpeg_build/lib/pkgconfig >> $HOME/.bashrc && \ 
   cd ~/ffmpeg_sources/ffmpeg-5.1.7 && PATH="$HOME/bin:$PATH" ./configure \
   --prefix="$HOME/ffmpeg_build" \
   --pkg-config-flags="--static" \
@@ -91,7 +90,6 @@ RUN echo export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgco
   --enable-libx264 \
   --enable-libx265 \
   --enable-nonfree \
-  --enable-libdav1d \
   --enable-shared \
   --disable-static \
   --disable-vaapi && \
@@ -102,16 +100,6 @@ RUN echo export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/lib/x86_64-linux-gnu/pkgco
   PATH="$HOME/bin:$PATH" make && \
   make install && \
   hash -r
-RUN pip install --force-reinstall torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 numpy==1.26.4
-COPY getting_started /workspace/getting_started
-COPY scripts /workspace/scripts
-COPY demo_data /workspace/demo_data
-RUN pip install -e . --no-deps
-# need to install accelerate explicitly to avoid version conflicts
-RUN pip install accelerate>=0.26.0
-COPY gr00t /workspace/gr00t
-COPY Makefile /workspace/Makefile
-RUN pip3 install -e .
 # Clean any existing OpenCV installations
 RUN pip uninstall -y opencv-python opencv-python-headless || true
 RUN rm -rf /usr/local/lib/python3.10/dist-packages/cv2 || true
@@ -131,3 +119,14 @@ RUN cmake  ../opencv-4.11.0 \
 RUN cmake --build .
 RUN cp lib/python3/cv2.cpython-311-x86_64-linux-gnu.so /opt/conda/lib/python3.11/site-packages/
 WORKDIR /workspace
+RUN pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 numpy==1.26.4
+RUN pip install flash_attn==2.7.1.post4  --no-build-isolation
+COPY getting_started /workspace/getting_started
+COPY scripts /workspace/scripts
+COPY demo_data /workspace/demo_data
+RUN pip install -e . --no-deps
+# need to install accelerate explicitly to avoid version conflicts
+RUN pip install accelerate>=0.26.0
+COPY gr00t /workspace/gr00t
+COPY Makefile /workspace/Makefile
+RUN pip3 install -e .
