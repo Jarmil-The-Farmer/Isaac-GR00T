@@ -18,7 +18,6 @@ _modality_template = {
         "right_hand": {"start": 20, "end": 26},
     },
     "video": {"ego_view": {"original_key": "observation.images.cam_high"}},
-    "annotation": {"human.action.task_description": {"task_index": 0, "task": "Pick up the red cup on the table."}, "human.validity": {}},
 }
 
 if __name__ == "__main__":
