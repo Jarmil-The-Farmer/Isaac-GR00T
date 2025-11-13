@@ -100,14 +100,8 @@ def import_external_data_config(data_config_str: str) -> Optional[BaseDataConfig
 
         module = importlib.import_module(module_path)
         if not hasattr(module, class_name):
-            available = [
-                n
-                for n in dir(module)
-                if not n.startswith("_") and isinstance(getattr(module, n), type)
-            ]
-            raise AttributeError(
-                f"Class '{class_name}' not found in '{module_path}'. Available: {available}"
-            )
+            available = [n for n in dir(module) if not n.startswith("_") and isinstance(getattr(module, n), type)]
+            raise AttributeError(f"Class '{class_name}' not found in '{module_path}'. Available: {available}")
 
         # assert if the class has 'transform' and 'modality_config' methods
         if not hasattr(getattr(module, class_name), "transform"):
@@ -340,6 +334,60 @@ class UnitreeG1FullBodyDataConfig(UnitreeG1DataConfig):
     language_keys = ["annotation.human.task_description"]
     observation_indices = [0]
     action_indices = list(range(16))
+
+
+###########################################################################################
+
+
+class JarmilUpperDataConfig(BaseDataConfig):
+    video_keys = ["video.ego_view"]
+    state_keys = ["state.left_arm", "state.right_arm", "state.left_hand", "state.right_hand"]
+    action_keys = ["action.left_arm", "action.right_arm", "action.left_hand", "action.right_hand"]
+    language_keys = ["annotation.human.action.task_description"]
+    observation_indices = [0]
+    action_indices = list(range(26))
+
+    def transform(self) -> ModalityTransform:
+        transforms = [
+            # video transforms
+            VideoToTensor(apply_to=self.video_keys),
+            VideoCrop(apply_to=self.video_keys, scale=0.95),
+            VideoResize(apply_to=self.video_keys, height=224, width=224, interpolation="linear"),
+            VideoColorJitter(
+                apply_to=self.video_keys,
+                brightness=0.3,
+                contrast=0.4,
+                saturation=0.5,
+                hue=0.08,
+            ),
+            VideoToNumpy(apply_to=self.video_keys),
+            # state transforms
+            StateActionToTensor(apply_to=self.state_keys),
+            StateActionTransform(
+                apply_to=self.state_keys,
+                normalization_modes={key: "min_max" for key in self.state_keys},
+            ),
+            # action transforms
+            StateActionToTensor(apply_to=self.action_keys),
+            StateActionTransform(
+                apply_to=self.action_keys,
+                normalization_modes={key: "min_max" for key in self.action_keys},
+            ),
+            # concat transforms
+            ConcatTransform(
+                video_concat_order=self.video_keys,
+                state_concat_order=self.state_keys,
+                action_concat_order=self.action_keys,
+            ),
+            # model-specific transform
+            GR00TTransform(
+                state_horizon=len(self.observation_indices),
+                action_horizon=len(self.action_indices),
+                max_state_dim=26,
+                max_action_dim=26,
+            ),
+        ]
+        return ComposedModalityTransform(transforms=transforms)
 
 
 ###########################################################################################
@@ -782,6 +830,7 @@ DATA_CONFIG_MAP = {
     "so100": So100DataConfig(),
     "so100_dualcam": So100DualCamDataConfig(),
     "unitree_g1": UnitreeG1DataConfig(),
+    "jarmil_upper_body": JarmilUpperDataConfig(),
     "unitree_g1_full_body": UnitreeG1FullBodyDataConfig(),
     "oxe_droid": OxeDroidDataConfig(),
     "agibot_genie1": AgibotGenie1DataConfig(),
