@@ -12,7 +12,9 @@
         "--ulimit",
         "stack=67108864",
         "-v",
-        "/ssd_crucial/projects/jarmil/data:/mnt/data"
+        "/ssd_crucial/projects/jarmil/data:/mnt/data",
+        "-p",
+        "6006:6006"
     ],
     "customizations": {
         "vscode": {
