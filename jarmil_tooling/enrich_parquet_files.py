@@ -7,7 +7,7 @@ import pandas as pd
 
 if __name__ == "__main__":
     arg_parser = ArgumentParser()
-    arg_parser.add_argument("meta_path", type=str, nargs=1, help="Path to `meta` folder of the dataset where `modality.json` will be saved.")
+    arg_parser.add_argument("meta_path", type=str, nargs=1, help="Path to root folder of data.")
 
     args = arg_parser.parse_args()
 
